@@ -1,0 +1,32 @@
+
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths-ignore:
+      - "**.md"
+      - ".vscode/**"
+      - ".devcontainer/**"
+      - "docs/**"
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+
+    container:
+      image: python:3.11-bullseye
+
+    steps:
+      # ワークフローの可視化
+      - uses: Kesin11/actions-timeline@v2
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install psycopg2-binary dependent packages
+        run: apt-get update && apt-get install libpq-dev gcc make -y
