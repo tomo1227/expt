@@ -27,6 +27,3 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install psycopg2-binary dependent packages
-        run: apt-get update && apt-get install libpq-dev gcc
