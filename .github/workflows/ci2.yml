@@ -24,6 +24,3 @@ jobs:
     steps:
       # ワークフローの可視化
       - uses: Kesin11/actions-timeline@v2
-
-      - name: Checkout repository
-        uses: actions/checkout@v4
