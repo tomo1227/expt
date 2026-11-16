@@ -12,7 +12,7 @@ AI と一緒に、小さな実験を実装・検証するリポジトリです�
 3. 初回作成時に `make check` が実行される。以後もコンテナ内で同じコマンドを使う。
 4. Copilot を利用する場合は GitHub にサインインする。利用権限が必要です。
 
-コンテナは Ubuntu 24.04 ベースで、Git、GitHub CLI (`gh`)、make、Python 3 を利用できます。
+コンテナは Ubuntu 24.04 ベースで、Git、GitHub CLI (`gh`)、APM、make、Python 3 を利用できます。
 Python は設定検証用で、アプリの言語を指定するものではありません。
 ソースはホストからマウントされるため、コンテナ内の変更はホストにも反映されます。
 Docker ソケットの共有、特権モード、AI 操作の無条件承認は設定していません。
@@ -23,6 +23,32 @@ Dev Containers CLI を利用する場合:
 devcontainer up --workspace-folder .
 devcontainer exec --workspace-folder . make check
 ```
+
+### Agent Package Manager
+
+[APM](https://github.com/microsoft/apm) CLI を公式の Linux / macOS 向けインストーラーで導入しています。
+バージョンは Dockerfile の `APM_VERSION` で `0.35.1` に固定しています。
+インストーラー自体は公式 URL の最新版を取得するため、完全な再現性を保証するものではありません。
+既存コンテナでは `Dev Containers: Rebuild Container` を実行してから確認してください。
+
+```sh
+apm --version
+apm --help
+```
+
+このリポジトリは `microsoft/apm-sample-package#v1.0.0` を Copilot 向けに導入しています。
+`apm.yml` が依存関係、`apm.lock.yaml` が解決したコミットと展開ファイルのハッシュを記録します。
+展開された指示・エージェント・プロンプト・スキルもレビュー可能なソースとしてバージョン管理し、`apm_modules/` はコミットしません。
+
+```sh
+# clone 後、リポジトリのルートで依存関係を復元
+apm install
+
+# 依存関係と展開ファイルを検査
+apm audit --ci
+```
+
+パッケージの内容と推移依存も追加前に確認してください。サンプルの推移依存は上流で参照が未固定ですが、ロックファイルには解決済みコミットが記録されます。依存を更新するときは差分をレビューしてください。
 
 ## AI 開発の進め方
 

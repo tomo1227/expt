@@ -8,3 +8,6 @@ __pycache__/
 *.pyc
 coverage/
 dist/
+
+# APM dependencies
+apm_modules/
