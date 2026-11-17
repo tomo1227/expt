@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 ARG APM_VERSION=0.35.1
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl gh make python3 \
+    && apt-get install -y --no-install-recommends ca-certificates curl gh git make python3 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

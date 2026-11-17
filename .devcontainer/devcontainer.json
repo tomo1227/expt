@@ -4,6 +4,12 @@
     "dockerfile": "Dockerfile"
   },
   "remoteUser": "vscode",
+  "remoteEnv": {
+    "GH_TOKEN": "${localEnv:GH_TOKEN}"
+  },
+  "mounts": [
+    "type=bind,source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,readonly"
+  ],
   "updateRemoteUserUID": true,
   "postCreateCommand": "make check",
   "customizations": {
