@@ -9,10 +9,10 @@ AI と一緒に、小さな実験を実装・検証するリポジトリです�
 
 1. Docker を起動し、このリポジトリを VS Code で開く。
 2. `Dev Containers: Reopen in Container` を実行する。
-3. 初回作成時に `make check` が実行される。以後もコンテナ内で同じコマンドを使う。
+3. 初回作成時に `make aidlc-setup && make check` が実行される。以後の検証もコンテナ内で `make check` を使う。
 4. Copilot を利用する場合は GitHub にサインインする。利用権限が必要です。
 
-コンテナは Ubuntu 24.04 ベースで、Git、GitHub CLI (`gh`)、APM、make、Python 3 を利用できます。
+コンテナは Ubuntu 24.04 ベースで、Git、GitHub CLI (`gh`)、APM、AI-DLC、make、Python 3 を利用できます。
 Python は設定検証用で、アプリの言語を指定するものではありません。
 ソースはホストからマウントされるため、コンテナ内の変更はホストにも反映されます。
 Docker ソケットの共有、特権モード、AI 操作の無条件承認は設定していません。
@@ -56,22 +56,31 @@ apm audit --ci
 VS Code / Copilot がルートの指示ファイルを読み込む構成です。
 別の AI ツールでは、対応状況を確認し、必要ならこのファイルを明示的にコンテキストへ追加してください。
 
-1. `/issue-create` で AI に Issue を作成させる。
-2. `/issue-review <Issue URL>` で仕様をレビューし、指摘を解消する。
-3. 人が AI のレビューコメントを確認し、そのコメントに `+1` リアクションを付けて承認する。ハッシュの転記は不要。
-4. `/implement <Issue URL> を実装して Draft PR を作成` と依頼する。
-5. `/review <PR URL>` で AI がコードレビューする。修正後は再レビューする。
-6. 人が CI とレビューを確認して、承認・マージを判断する。
+公式 [AI-DLC](https://github.com/awslabs/aidlc-workflows) `2.11.4` のCopilot構成を使用します。
+既存コンテナは `Dev Containers: Rebuild Container` でCLIを追加し、VS Codeを開き直してください。
 
-詳細な承認条件、GitHub 認証、PR 作成条件は [AI 開発フロー](docs/ai-workflow.md)を参照してください。
-承認前の実装を禁止し、Issue の仕様を変更した場合は再承認します。
-現在は VS Code から工程ごとに呼び出す半自動構成であり、GitHub イベントによる自動起動は設定していません。
-既存コンテナでは `Dev Containers: Rebuild Container` を実行すると `gh` が追加されます。
+```sh
+make aidlc-setup
+aidlc --version
+aidlc doctor
+```
+
+1. VS Code 1.130以上で、信頼済みWorkspaceと `chat.useHooks` 有効を確認する。組織ポリシーでHooksが禁止されていれば停止する。
+2. 新しいCopilotチャットで `/aidlc --doctor` を実行し、実フックの動作を確認する。
+3. `/aidlc <作りたいもの、またはIssue URLと依頼内容>` から開始する。
+4. AIが提示する計画・成果物を確認し、人が各承認ゲートへ回答する。変更時は再レビュー・再承認する。
+5. 公開する場合は、ブランチ作成・commit・push・Draft PR作成を明示的に依頼する。承認だけでは公開しない。
+6. `/review <PR URL>` で最新差分への助言を受け、人がCI・レビューを確認して承認・マージを判断する。
+
+固定リリース・SHA-256、保存場所、開始・中断・再開、更新・撤去、旧コマンドからの移行は [AI開発フロー](docs/ai-workflow.md)を参照してください。
+旧 `/issue-create`、`/issue-review`、`/implement` と独自ハッシュ承認は新規タスクでは使用しません。
+GitHubイベントでAIを自動起動する設定はありません。人の承認・PR承認・マージはAIに代行させません。
 
 計画の補助には `/experiment-plan` を使えます。まとまった実験の結果は [テンプレート](docs/experiments/TEMPLATE.md)を基に `docs/experiments/YYYY-MM-DD-topic.md` へ記録してください。
 
 プロンプトは [.github/prompts](.github/prompts) にあります。
-スラッシュコマンドが表示されない場合は `Chat: Run Prompt...` から実行できます。
+AI-DLCのスキルは [.github/skills](.github/skills) にあり、`make aidlc-setup` で公式配布物から復元できます。
+補助プロンプトが表示されない場合は `Chat: Run Prompt...`、AI-DLCが表示されない場合はバージョン・スキル検出・Trustを確認して新しいチャットを開始してください。
 レビュー用プロンプトは読み取り中心の Ask モードを使いますが、独立した人手レビューや承認の代替ではありません。
 
 ## 検証と CI
@@ -80,7 +89,8 @@ VS Code / Copilot がルートの指示ファイルを読み込む構成です�
 make check
 ```
 
-現在の検証対象は Dev Container 設定の JSON 構文と `git diff --check` のみです。
+現在の検証対象はDev Container設定のJSON構文、導入スクリプトのシェル構文、追跡済みAI-DLC構成（pin・フック・スキル・承認保護）、`git diff --check` です。
+CLI診断や構成チェックだけで、VS Codeの実フック実行・承認前停止・承認後再開を検証したことにはしません。[実験記録](docs/experiments/2026-11-17-aidlc-v2.md)に手動確認の結果を記録します。
 アプリのテスト、ビルド、フォーマット、静的解析はまだありません。
 CI は Ubuntu ランナー上で `make check` を直接実行します。Dev Container のビルド・起動確認は行いません。
 ベースイメージはタグ指定のため、完全な再現性が必要になったら digest 固定を検討してください。
