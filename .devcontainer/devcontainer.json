@@ -11,7 +11,7 @@
     "type=bind,source=${localEnv:HOME}/.config/gh,target=/home/vscode/.config/gh,readonly"
   ],
   "updateRemoteUserUID": true,
-  "postCreateCommand": "make check",
+  "postCreateCommand": "make aidlc-setup && make check",
   "customizations": {
     "vscode": {
       "extensions": [

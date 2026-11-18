@@ -15,3 +15,10 @@ RUN curl -fsSL https://aka.ms/apm-unix -o /tmp/install-apm.sh \
      && chmod -R a+rX /usr/local/lib/apm \
     && rm /tmp/install-apm.sh \
     && apm --version
+
+COPY install-aidlc.sh /tmp/install-aidlc.sh
+USER vscode
+RUN sh /tmp/install-aidlc.sh
+USER root
+RUN rm /tmp/install-aidlc.sh
+ENV PATH="/home/vscode/.local/bin:${PATH}"
