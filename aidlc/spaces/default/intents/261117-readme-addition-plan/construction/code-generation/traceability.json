@@ -1,0 +1,37 @@
+{
+  "stage": "code-generation",
+  "upstream_ids": [
+    "FR1",
+    "FR2",
+    "FR3",
+    "NFR1",
+    "NFR2"
+  ],
+  "coverage": [
+    {
+      "id": "FR1",
+      "status": "OK",
+      "target": "README.md"
+    },
+    {
+      "id": "FR2",
+      "status": "OK",
+      "target": "aidlc/spaces/default/intents/261117-readme-addition-plan/construction/code-generation/code-summary.md"
+    },
+    {
+      "id": "FR3",
+      "status": "OK",
+      "target": "aidlc/spaces/default/intents/261117-readme-addition-plan/construction/code-generation/code-summary.md"
+    },
+    {
+      "id": "NFR1",
+      "status": "OK",
+      "target": "README.md"
+    },
+    {
+      "id": "NFR2",
+      "status": "OK",
+      "target": "README.md"
+    }
+  ]
+}
